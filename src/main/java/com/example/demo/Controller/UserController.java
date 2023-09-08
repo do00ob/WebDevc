@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+//Cross这个注解可以使当前控制器允许跨域
+//想要全部都能跨域 要么每个控制器都加注解 要么添加一个配置类
 @CrossOrigin
 public class UserController {
 
