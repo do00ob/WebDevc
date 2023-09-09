@@ -19,6 +19,7 @@ public class UserController {
     @Autowired
     private UserMapper userMapper;
 
+    //获取
     @GetMapping("/user/get")
     public List query()
     {
@@ -27,7 +28,8 @@ public class UserController {
         return list;
     }
 
-    @PostMapping("/user")
+    //新增
+    @PostMapping("/user/save")
     public String save(student s)
     {
         int i = userMapper.insert(s);
@@ -40,4 +42,8 @@ public class UserController {
             return "插入失敗";
         }
     }
+
+    //删除
+    @GetMapping("/delete")
+    public Integer delete(Integer id){ return userMapper.deleteById(id);}
 }
