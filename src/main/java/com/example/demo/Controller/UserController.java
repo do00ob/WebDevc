@@ -1,13 +1,18 @@
 package com.example.demo.Controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.demo.common.QueryPageParam;
 import com.example.demo.entity.student;
 import com.example.demo.mapper.UserMapper;
+import com.example.demo.service.UserService;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -18,6 +23,9 @@ public class UserController {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private UserService userService;
 
     //获取
     @GetMapping("/user/get")
@@ -46,4 +54,55 @@ public class UserController {
     //删除
     @GetMapping("/delete")
     public Integer delete(Integer id){ return userMapper.deleteById(id);}
+
+    @PostMapping("/listPage")
+    public List<student> listPage(@RequestBody QueryPageParam query)
+    {
+        System.out.println(query);
+        System.out.println("num==="+query.getPageNum());
+        System.out.println("size==="+query.getPageSize());
+
+        HashMap param = query.getParam();
+        String name = (String)param.get("name");
+
+        Page<student> page = new Page();
+        page.setCurrent(query.getPageNum());
+        page.setSize(query.getPageSize());
+
+        LambdaQueryWrapper<student> lambdaQueryWrapper = new LambdaQueryWrapper();
+        lambdaQueryWrapper.like(student::getName,name);
+
+        return null;
+    }
+
+    @PostMapping("/findByPage")
+    public List<student> findByPage(@RequestBody QueryPageParam query)
+    {
+        System.out.println(query);
+        System.out.println("num==="+query.getPageNum());
+        System.out.println("size==="+query.getPageSize());
+
+        HashMap param = query.getParam();
+        String name = (String)param.get("name");
+        String gender =(String)param.get("gender");
+
+        Page<student> page = new Page();
+        page.setCurrent(query.getPageNum());
+        page.setSize(query.getPageSize());
+
+        LambdaQueryWrapper<student> lambdaQueryWrapper = new LambdaQueryWrapper();
+        if(StringUtils.isNotBlank(name)){
+            lambdaQueryWrapper.like(student::getName,name);
+        }
+        if(StringUtils.isNotBlank(gender)){
+            lambdaQueryWrapper.eq(student::getGender,gender);
+        }
+
+        IPage result = userService.page(page,lambdaQueryWrapper);
+        //IPage result = userService.pageC(page);
+        //System.out.println("total==="+result.getTotal());
+        page.setTotal(result.getTotal());
+        System.out.println(result.getRecords());
+        return result.getRecords();
+    }
 }
