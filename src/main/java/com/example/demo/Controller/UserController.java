@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.QueryPageParam;
 import com.example.demo.entity.student;
 import com.example.demo.mapper.UserMapper;
+import com.example.demo.common.Result;
 import com.example.demo.service.UserService;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,13 @@ public class UserController {
         return list;
     }
 
+    @GetMapping("findByNo")
+    public Result findByNo(@RequestBody String id)
+    {
+        List list = userService.lambdaQuery().eq(student::getId,id).list();
+        return list.size()>0?Result.suc(list):Result.fail();
+    }
+
     //新增
     @PostMapping("/user/save")
     public String save(student s)
@@ -49,6 +57,12 @@ public class UserController {
         {
             return "插入失敗";
         }
+    }
+
+    @PostMapping("/save2")
+    public Result save2(@RequestBody student std)
+    {
+        return userService.save(std)?Result.suc():Result.fail();
     }
 
     //删除
@@ -76,7 +90,7 @@ public class UserController {
     }
 
     @PostMapping("/findByPage")
-    public List<student> findByPage(@RequestBody QueryPageParam query)
+    public Result findByPage(@RequestBody QueryPageParam query)
     {
         System.out.println(query);
         System.out.println("num==="+query.getPageNum());
@@ -103,6 +117,6 @@ public class UserController {
         //System.out.println("total==="+result.getTotal());
         page.setTotal(result.getTotal());
         System.out.println(result.getRecords());
-        return result.getRecords();
+        return Result.suc(result.getRecords(),result.getTotal());
     }
 }
