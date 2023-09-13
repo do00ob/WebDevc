@@ -37,10 +37,10 @@ public class UserController {
         return list;
     }
 
-    @GetMapping("findByNo")
-    public Result findByNo(@RequestBody String id)
+    @GetMapping("/findByName")
+    public Result findByName(@RequestParam String name)
     {
-        List list = userService.lambdaQuery().eq(student::getId,id).list();
+        List list = userService.lambdaQuery().eq(student::getName,name).list();
         return list.size()>0?Result.suc(list):Result.fail();
     }
 
@@ -118,5 +118,18 @@ public class UserController {
         page.setTotal(result.getTotal());
         System.out.println(result.getRecords());
         return Result.suc(result.getRecords(),result.getTotal());
+    }
+
+    //更新
+    @PostMapping("/user/update")
+    public Result update(@RequestBody student std){
+        return userService.updateById(std)?Result.suc():Result.fail();
+    }
+
+    //什么地方yongRequestParam 类似String这种非实体类时可以用
+    //删除
+    @GetMapping("/user/del")
+    public Result del(@RequestParam String id){
+        return userService.removeById(id)?Result.suc():Result.fail();
     }
 }
